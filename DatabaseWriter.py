@@ -18,13 +18,13 @@ def retrieve_footprint_from_url(url, port):
     TLS connection with a given URL.
     """
 
-    conn = ssl.create_connection((url, port),timeout=1)     #Makes a connection
+    conn = ssl.create_connection((url, port),timeout=0.5)     #Makes a connection
     context = ssl.SSLContext(ssl.PROTOCOL_TLS)
     sock = context.wrap_socket(conn, server_hostname=url)   #Wrap the conncetion with TLS protocol
     certificate = sock.getpeercert(True)                    #True gets the 'der' certificate (easier for comptuting the certificate)
     return hashlib.sha1(certificate).hexdigest()
 
-def main(Me = 1, number_thread = 1):
+def main(Me = 1, number_thread = 1, conn_db=None):
 
     """
     Connect to the testDB postgresql Database retrieves each 
@@ -42,9 +42,9 @@ def main(Me = 1, number_thread = 1):
     directly.
     """
 
-    for n in range((SIZE_DB//number_thread)*(Me) + 1500, (SIZE_DB//number_thread)*(Me+1), 100):  #Check wether the loop is correct
+    for n in range((SIZE_DB//number_thread)*(Me), (SIZE_DB//number_thread)*(Me) + 1000, 100):  #Check wether the loop is correct
 
-        conn_db = psycopg2.connect(f"dbname={DATABASE} user={USER}")
+        #conn_db = psycopg2.connect(f"dbname={DATABASE} user={USER}")
         cur = conn_db.cursor()
         sqlQ = f"SELECT url,id FROM {TABLE} ORDER BY id LIMIT 100 OFFSET {n};"
         cur.execute(sqlQ)
@@ -55,8 +55,8 @@ def main(Me = 1, number_thread = 1):
                 the_url = elt[0]
                 the_id = elt[1]
                 sha1_footprint = retrieve_footprint_from_url(the_url, PORT)
-                #print("Footprint: "+sha1_footprint)        #Decomment to debug the code
-                #print("Id: "+ str(the_id))                 #Same here
+                print("Footprint: "+sha1_footprint)        #Decomment to debug the code
+                print("Id: "+ str(the_id))                 #Same here
                 cur.execute(f"UPDATE {TABLE} SET sha1='{sha1_footprint}' WHERE id={the_id};",(the_id,))
 
             except:
@@ -66,7 +66,7 @@ def main(Me = 1, number_thread = 1):
         print(n+100)                                           #Same here (Best is to keep this line uncommented for overviewing the good functionning of the script)
         conn_db.commit()
         cur.close()
-        conn_db.close()
+        #conn_db.close()
 
 if __name__ == "__main__":
     main()
