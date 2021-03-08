@@ -1,0 +1,1 @@
+drop tls $EXTERNAL_NET 443 -> $HOME_NET any (msg:"message from suricata dropping the https connection"; tls.fingerprint:"SHA1 footprint here"; reference url, une_url_de_reference; sid:"numéro de la bdd"; rev:"version de la sid";)
