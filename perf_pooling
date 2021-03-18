@@ -1,13 +1,1 @@
-Time Elapsed: 40.09884835407138 ; Size Database: 1000 ; Overall Speed: 24.93837207418119
-Time Elapsed: 52.97249074932188 ; Size Database: 3000 ; Overall Speed: 56.63316860437423
-Time Elapsed: 43.39306818321347 ; Size Database: 9000 ; Overall Speed: 207.40639869023212
-Time Elapsed: 41.92036111000925 ; Size Database: 1000 ; Overall Speed: 23.8547563408568 ; Number of Threads: 50
-Time Elapsed: 708.6715902369469 ; Size Database: 1000 ; Overall Speed: 1.411090854743657 ; Number of Threads: 1
-Time Elapsed: 116.21510607749224 ; Size Database: 1000 ; Overall Speed: 8.604733358270998 ; Number of Threads: 10
-Time Elapsed: 41.20952196326107 ; Size Database: 1000 ; Overall Speed: 24.266236354100773 ; Number of Threads: 50
-Time Elapsed: 40.08586941007525 ; Size Database: 1000 ; Overall Speed: 24.94644658370958 ; Number of Threads: 100
-Time Elapsed: 54.1328223310411 ; Size Database: 10000 ; Overall Speed: 184.7308078423569 ; Number of Threads: 200
-Time Elapsed: 252.39557271357626 ; Size Database: 10000 ; Overall Speed: 39.62034631783422 ; Number of Threads: 100
-Time Elapsed: 41.01838150527328 ; Size Database: 20000 ; Overall Speed: 487.58627878647087 ; Number of Threads: 300
-Time Elapsed: 145.62291509192437 ; Size Database: 100000 ; Overall Speed: 686.7051105032135 ; Number of Threads: 700
-Time Elapsed: 388.8562172604725 ; Size Database: 1664208 ; Overall Speed: 4279.751553734944 ; Number of Threads: 700
+Time Elapsed: 20584.929777624086 ; Size Database: 1664208 ; Overall Speed: 80.84594011144026 ; Number of Threads: 200

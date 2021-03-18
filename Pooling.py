@@ -5,7 +5,9 @@ import hashlib
 import ssl
 from socket import *
 import config
+import OpenSSL
 
+from datetime import datetime
 import time
 import threading as th
 
@@ -19,10 +21,10 @@ PERF_FILE = config.perf_file
 #DATABASE = "testDB" #Change with more explicit name
 #TABLE = "testtable4"   # Same here
 
-SIZE_DB = 1664208    #This should be retrieved from the DB itself instead of putting it as variable
+SIZE_DB = 1664208       #This should be retrieved from the DB itself instead of putting it as variable
 REAL_DB_SIZE = 1664208
-NUMBER_THREADS = 100     #Much time is lost with connections so nbr_threads must be between 100 and 1000 for optimized parsing
-ELT_PER_TH = 10
+NUMBER_THREADS = 200    #Much time is lost with connections so nbr_threads must be between 100 and 1000 for optimized parsing
+ELT_PER_TH = 10       #Cannot be 1 else not enough memory (too much database requests in parallel)
 
 def multithreading():
     tic = time.perf_counter()
@@ -56,12 +58,19 @@ def retrieve_footprint_from_url(url, port):
     Retrieve the SHA1 footprint from a website by creating a
     TLS connection with a given URL.
     """
-
-    conn = ssl.create_connection((url, port),timeout=3)     #Makes a connection
+    conn = ssl.create_connection((url, port),timeout=2)     #Makes a connection
     context = ssl.SSLContext(ssl.PROTOCOL_TLS)
     sock = context.wrap_socket(conn, server_hostname=url)   #Wrap the connection with TLS protocol
-    certificate = sock.getpeercert(True)                    #True gets the 'der' certificate (easier for comptuting the certificate)
-    return hashlib.sha1(certificate).hexdigest()
+    certificate = sock.getpeercert(True)                    #True gets the 'der' certificate (easier for computing the certificate) 
+    PEM_cert = ssl.DER_cert_to_PEM_cert(certificate)
+    try:
+        x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, PEM_cert)
+        cert_not_after = datetime.strptime(x509.get_notAfter().decode('ascii'), '%Y%m%d%H%M%SZ')
+        #print(str(cert_not_after))
+    except Exception as e:
+        pass
+        #print(e)
+    return (hashlib.sha1(certificate).hexdigest(),str(cert_not_after)[:10])
 
 def wrapper(tcp,n,elt_per_thread):
     ps_connection = tcp.getconn()
@@ -87,14 +96,19 @@ def main(n,conn_db,elt_per_thread):
         try:
             the_url = elt[0]
             the_id = elt[1]
-            sha1_footprint = retrieve_footprint_from_url(the_url, PORT)
+            if int(the_id)%5000 == 0 :
+                print(f"Line number {the_id} has been completed.")
+            (sha1_footprint,cert_time) = retrieve_footprint_from_url(the_url, PORT)
             #print("Footprint: "+sha1_footprint)        #Decomment to debug the code
             #print("Id: "+ str(the_id))                 #Same here
-            cur.execute(f"UPDATE {TABLE} SET sha1='{sha1_footprint}' WHERE id={the_id};",(the_id,))
+            timestamp = str(datetime.now())
+            #print(timestamp)
+            cur.execute(f"UPDATE {TABLE} SET sha1='{sha1_footprint}',certtime='{cert_time}',timestamp='{timestamp}' WHERE id={the_id};")
+            #cur.execute(f"UPDATE {TABLE} SET sha1='{sha1_footprint}' WHERE id={the_id};")
 
-        except:
+        except Exception as e:
             pass
-            #print("Error")                             #Same here
+            #print(e)                             #Same here
                 
     #print(n+loop_size)                                 #Same here
     conn_db.commit()

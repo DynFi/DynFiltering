@@ -1,0 +1,3 @@
+
+Selectionner le nombre de lignes ou la date d'expiration est après aujourd'hui
+SELECT count(*) FROM (SELECT DISTINCT sha1,certtime FROM blacklist_dynfi WHERE sha1 is not null) AS t WHERE certtime > TO_DATE('20210318','YYYYMMDD');
