@@ -6,23 +6,24 @@ import ssl
 from socket import *
 import config
 import OpenSSL
-
 from datetime import datetime
 import time
 import threading as th
 
-PORT = 443
 
+#
+PORT = 443
 USER = config.user
 TABLE = config.main_table
 DATABASE = config.db
 PERF_FILE = config.perf_file
-#USER = ""  #Works without specifying a user 
-#DATABASE = "testDB" #Change with more explicit name
-#TABLE = "testtable4"   # Same here
-
-SIZE_DB = 1664208       #This should be retrieved from the DB itself instead of putting it as variable
-REAL_DB_SIZE = 1664208
+conn_db = psycopg2.connect(f"dbname={config.db} user={config.user}")
+cur = conn_db.cursor()
+cur.execute(f"SELECT count(*) FROM {config.main_table};")
+SIZE_DB = cur.fetchall()[0][0]       #This should be retrieved from the DB itself instead of putting it as variable
+print(f"Size of Database = {SIZE_DB}")
+cur.close()
+conn_db.close()
 NUMBER_THREADS = 200    #Much time is lost with connections so nbr_threads must be between 100 and 1000 for optimized parsing
 ELT_PER_TH = 10       #Cannot be 1 else not enough memory (too much database requests in parallel)
 
@@ -58,7 +59,7 @@ def retrieve_footprint_from_url(url, port):
     Retrieve the SHA1 footprint from a website by creating a
     TLS connection with a given URL.
     """
-    conn = ssl.create_connection((url, port),timeout=2)     #Makes a connection
+    conn = ssl.create_connection((url, port),timeout=10)     #Makes a connection
     context = ssl.SSLContext(ssl.PROTOCOL_TLS)
     sock = context.wrap_socket(conn, server_hostname=url)   #Wrap the connection with TLS protocol
     certificate = sock.getpeercert(True)                    #True gets the 'der' certificate (easier for computing the certificate) 
@@ -91,11 +92,14 @@ def main(n,conn_db,elt_per_thread):
     sqlQ = f"SELECT url,id FROM {TABLE} ORDER BY id LIMIT {elt_per_thread} OFFSET {n*elt_per_thread};" #Else memory is not big enough
     cur.execute(sqlQ)
     list_urls = cur.fetchall()
-
+    #print(len(list_urls))
     for elt in list_urls:
+        
+        the_url = elt[0]
+        the_id = elt[1]
+        #print("id :"+str(the_id))
+
         try:
-            the_url = elt[0]
-            the_id = elt[1]
             if int(the_id)%5000 == 0 :
                 print(f"Line number {the_id} has been completed.")
             (sha1_footprint,cert_time) = retrieve_footprint_from_url(the_url, PORT)
@@ -107,9 +111,8 @@ def main(n,conn_db,elt_per_thread):
             #cur.execute(f"UPDATE {TABLE} SET sha1='{sha1_footprint}' WHERE id={the_id};")
 
         except Exception as e:
-            pass
-            #print(e)                             #Same here
-                
+            cur.execute(f"UPDATE {TABLE} SET error='{e}' WHERE id={the_id};")
+     
     #print(n+loop_size)                                 #Same here
     conn_db.commit()
     cur.close()

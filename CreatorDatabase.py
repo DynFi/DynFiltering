@@ -12,7 +12,8 @@ def create_blacklist_dynfi():
             cur.execute(f'''DROP TABLE {config.groupe_table};''')
             cur.execute(f'''DROP TABLE {config.main_table};''')
             print("Drop tables Successful")
-        except:
+        except Exception as e:
+            print(e)
             pass
         cur.execute(f'''CREATE TABLE {config.main_table}
               (ID INT PRIMARY KEY    NOT NULL,
@@ -20,20 +21,23 @@ def create_blacklist_dynfi():
               GROUPE            INT     NOT NULL,
               SHA1        CHAR(40),
               CERTTIME      TIMESTAMP,
-              TIMESTAMP         TIMESTAMP);''')
+              TIMESTAMP         TIMESTAMP,
+              ERROR         VARCHAR(100));''')
         print("Blacklist_Dynfi Table created successfully")
+        try:
+            cur.execute(f"CREATE INDEX b_tree_idx ON {config.main_table} USING btree (url)")
+            print("B_tree index creation successfull")
+        except Exception as e:
+            print(e)
 
-        #cur.execute('''CREATE TABLE GROUPE
-        #      (ID INT PRIMARY KEY    NOT NULL,
-        #      GROUPE        TEXT    NOT NULL);''')
         cur.execute(f'''CREATE TABLE {config.groupe_table}
                 (ID INT PRIMARY KEY   NOT NULL,
                 GROUPE      VARCHAR(50)    NOT NULL);''')
         print("Groupe table Successful")
-
         con.commit()
         con.close()
-    except:
+    except Exception as e:
+        print(e)
         print("Database connection or table creation  did not succeed")
 
     try:
@@ -46,8 +50,8 @@ def create_blacklist_dynfi():
         print("Read files Successful")
         for i,line in enumerate(content):
             value = line.split(";")
-            if value[1] not in group_dict:
-                group_dict[value[1]] = len(group_dict)+1
+            if value[-2] not in group_dict:
+                group_dict[value[-2]] = len(group_dict)+1
         print("Dictionary Successful")
         for key,value in group_dict.items():
             print(f"key: {key}, value:{value}")
@@ -56,7 +60,7 @@ def create_blacklist_dynfi():
         con.close()
     except:
         print("Groupe database failed")
-
+    
     try:
         con = psycopg2.connect(f"dbname={config.db} user={config.user}")
         cur = con.cursor()
@@ -64,12 +68,18 @@ def create_blacklist_dynfi():
         content = database_file.readlines()
         for i,line in enumerate(content):
             value = line.split(";")
-            cur.execute(f"INSERT INTO {config.main_table} (ID,URL,GROUPE) VALUES ({i}, '{value[0]}', {group_dict[value[1]]});");
+            try:
+                cur.execute(f"INSERT INTO {config.main_table} (ID,URL,GROUPE) VALUES ({i}, '{value[0]}', {group_dict[value[1]]});");
+            except Exception as e:
+                print(e)
+                pass
         con.commit()
         con.close()
-    except:
+    except Exception as e:
+        print(e)
+        print(value)
+        print(line)
         print("Main Table failed")
-
 
 def create_suricata_database():
     try:
@@ -114,5 +124,6 @@ def fill_suricata_database():
         print(e)
 
 if __name__ == "__main__":
-    create_suricata_database()
-    fill_suricata_database()
+    create_blacklist_dynfi()
+    #create_suricata_database()
+    #fill_suricata_database()
