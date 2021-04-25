@@ -124,6 +124,6 @@ def fill_suricata_database():
         print(e)
 
 if __name__ == "__main__":
-    create_blacklist_dynfi()
-    #create_suricata_database()
-    #fill_suricata_database()
+    #create_blacklist_dynfi()
+    create_suricata_database()
+    fill_suricata_database()

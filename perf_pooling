@@ -51,3 +51,17 @@ Time Elapsed: 87.1866911156103 ; Size Database: 1336096 ; Overall Speed: 15324.5
 Time Elapsed: 173.0449529858306 ; Size Database: 1336096 ; Overall Speed: 7721.091987637474 ; Number of Threads: 200
 Time Elapsed: 518.8403964834288 ; Size Database: 1336096 ; Overall Speed: 2575.158004380011 ; Number of Threads: 50
 Time Elapsed: 15.735969170928001 ; Size Database: 1664208 ; Overall Speed: 105758.21431288787 ; Number of Threads: 50
+Time Elapsed: 13466.863444635645 ; Size Database: 1664208 ; Overall Speed: 123.57799623066025 ; Number of Threads: 500
+Time Elapsed: 19.088453266769648 ; Size Database: 1336096 ; Overall Speed: 69994.9849957701 ; Number of Threads: 500
+Time Elapsed: 51.72405607625842 ; Size Database: 1336096 ; Overall Speed: 25831.230211918246 ; Number of Threads: 500
+Time Elapsed: 5.462618829682469 ; Size Database: 1336096 ; Overall Speed: 244588.91269147265 ; Number of Threads: 500
+Time Elapsed: 491.14910568855703 ; Size Database: 1336096 ; Overall Speed: 2720.3470077114075 ; Number of Threads: 500
+Time Elapsed: 260.1369748581201 ; Size Database: 1336103 ; Overall Speed: 5136.151832044317 ; Number of Threads: 500
+Time Elapsed: 4497.150792920962 ; Size Database: 1336103 ; Overall Speed: 297.09988869023056 ; Number of Threads: 500
+Time Elapsed: 0.0030354950577020645 ; Size Database: 1336103 ; Overall Speed: 440159833.7674313 ; Number of Threads: 500
+Time Elapsed: 0.002931443974375725 ; Size Database: 1336103 ; Overall Speed: 455783228.9066804 ; Number of Threads: 500
+Time Elapsed: 0.0029286425560712814 ; Size Database: 1336103 ; Overall Speed: 456219212.2866496 ; Number of Threads: 500
+Time Elapsed: 0.0028981491923332214 ; Size Database: 1336103 ; Overall Speed: 461019399.3927344 ; Number of Threads: 500
+Time Elapsed: 14.628377510234714 ; Size Database: 1336103 ; Overall Speed: 91336.37678308468 ; Number of Threads: 500
+Time Elapsed: 559.9869422707707 ; Size Database: 1336103 ; Overall Speed: 2385.953848463048 ; Number of Threads: 500
+Time Elapsed: 2495.219690132886 ; Size Database: 1336103 ; Overall Speed: 535.4650755937422 ; Number of Threads: 500

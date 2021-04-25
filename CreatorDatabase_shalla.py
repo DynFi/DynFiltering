@@ -3,23 +3,29 @@ import config
 from datetime import datetime
 import os
 
-PATH = "/home/rmajoor/BL"
+PATH = '/home/rmajoor/BL'
 
 def get_group(sub_path,group_name):
     out = []
     with open('%s/domains'%sub_path,encoding='ISO-8859-1') as f:
         for line in f:
-            out.append([line.strip(),group_name])
+            line = line.strip()
+            out.append([line,group_name])
     with open('%s/urls'%sub_path,encoding='ISO-8859-1') as f:
         for line in f:
-            out.append([line.strip(),group_name])
+            loc = line.find("://")
+            if loc>0:
+                line = line[0:loc+3]+line.split("/")[2]
+            elif "/" in line:
+                line = line.split("/")[0]
+            line = line.strip()
+            out.append([line,group_name])
     return out
 
 def collect():
     group_dict = {}
     path = PATH
     groups = set(os.listdir(path))
-    #print(groups)
     groups.remove('COPYRIGHT')
     groups.remove('global_usage')
         
@@ -40,8 +46,6 @@ def collect():
                 sub_sub_path = '%s/%s'%(sub_path,gg)
                 g_list = get_group(sub_sub_path,group_name)
                 file_out+=g_list
-    #print("file_out =")
-    #print(file_out)
     return group_dict,file_out
 
 
@@ -58,7 +62,7 @@ def create_blacklist_dynfi():
             print(e)
             pass
         cur.execute(f'''CREATE TABLE {config.main_table}
-            (ID INT PRIMARY KEY      NOT NULL,
+            (ID SERIAL PRIMARY KEY      NOT NULL,
             URL           VARCHAR(2048)      NOT NULL,
             GROUPE            INT       NOT NULL,
             SHA1        CHAR(40),
@@ -67,15 +71,14 @@ def create_blacklist_dynfi():
             ERROR       VARCHAR(100));''')
         print("Blacklist_Dynfi Table created successfully")
 
-        cur.execute(f"CREATE INDEX b_tree_index ON {config.main_table} USING btree (ID);")
-        print("B_tree index creation successfull")
+        #cur.execute(f"CREATE INDEX b_tree_index ON {config.main_table} USING btree (ID)")
+        #print("B_tree index creation successfull")
         cur.execute(f'''CREATE TABLE {config.groupe_table}
             (ID INT PRIMARY KEY      NOT NULL,
             GROUPE     VARCHAR(50)   NOT NULL);''')
         print("Groupe table Successful")
-        
-        #cur.execute(f"CREATE INDEX b_tree_index ON {config.groupe_table} USING btree (ID);")
-        #print("B_tree on groupe_table succesfull")
+
+        print("B_tree on groupe_table succesfull")
         con.commit()
         con.close()
     except:
@@ -86,7 +89,7 @@ def create_blacklist_dynfi():
         con = psycopg2.connect(f"dbname={config.db} user={config.user}")
         print("Connection Successful")
         cur=con.cursor()
-        print(group_dict)
+
         for key,value in group_dict.items():
             #print(f"key: {key}, value:{value}")
             cur.execute(f"INSERT INTO {config.groupe_table} (ID,GROUPE) VALUES ({value},'{key}');");
@@ -94,7 +97,7 @@ def create_blacklist_dynfi():
         con.close()
     except:
         print("Groupe database failed")
-    lastf = []
+    #lastf = []
     try:
         con = psycopg2.connect(f"dbname={config.db} user={config.user}")
         print("Connection Successful")
@@ -102,11 +105,10 @@ def create_blacklist_dynfi():
         
         for i,f in enumerate(file_out):
             try:
-                lastf = [i,f]
                 val = str(f[0])
                 if "'" not in val:
-                    cur.execute(f"INSERT INTO {config.main_table} (ID,URL,GROUPE) VALUES ({i},'{val}',{group_dict[f[1]]});");
-                    con.commit()
+                    cur.execute(f"INSERT INTO {config.main_table} (URL,GROUPE) VALUES ('{val}',{group_dict[f[1]]});");
+
             except Exception as e:
                 print(e)
             #    pass

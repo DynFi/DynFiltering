@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Dynfi Suricata Rulesets</title>
+	</head>
+	<body>
+		<form action="/" method="post">
+			<ul id="groupe">
+			{% for item in data %}
+				<input type="checkbox" id="{{ item }}" name="groupe" value="{{ item }}">
+				<label for="{{ item }}"> {{ item }} </label><br />
+			{% endfor %}
+			</ul>
+			<input type="submit" value="Create Ruleset">
+		</form>
+	</body>
+</html>

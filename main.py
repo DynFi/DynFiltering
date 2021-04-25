@@ -26,9 +26,9 @@ libgcc_s = ctypes.CDLL('libgcc_s.so.1')
 
 def get_table_size(db,user,table):
     """
-    Retrieve the size of the given postgre table 
+    Retrieve the size of the given postgre table
     """
-    conn_db = psycopg2.connect(f"dbname={db} user={user}")
+    conn_db = psycopg2.connect(f"dbname={DATABASE} user={USER}")
     cur = conn_db.cursor()
     cur.execute(f"SELECT count(*) FROM {table};")
     size = cur.fetchall()[0][0]
@@ -45,7 +45,7 @@ def main():
         if (threaded_postgreSQL_pool):
             print("Connection pool created successfully using ThreadedConnectionPool")
             with ThreadPoolExecutor(max_workers=NUMBER_THREADS) as pool:
-                for n in range(SIZE_DB//ELT_PER_TH):
+                for n in range(887000//ELT_PER_TH, SIZE_DB//ELT_PER_TH):
                     ret = pool.submit(thread, threaded_postgreSQL_pool, n, ELT_PER_TH)
     except (Exception, psycopg2.DatabaseError) as error:
         print("Error while connecting to PostgreSQL",error)
@@ -89,7 +89,7 @@ def thread(threaded_postgresql_pool,n,elt_per_thread):
         cur.execute(sqlQ)
         list_urls = cur.fetchall()
         for elt in list_urls:
-            
+
             the_url = elt[0]
             the_id = elt[1]
 
