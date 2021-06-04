@@ -1,0 +1,18 @@
+To run the website, we always decided to use "screen" so that our terminal did not become useless
+
+we did the following in the terminal:
+
+###################
+screen -r   (to open a screen session)
+
+export FLASK_APP=hello.py
+
+flask run --host=0.0.0.0   (start the webserver)
+###################
+
+You can also make the site in https run "python3 -m flask -run --help" to know more about the certificates
+
+
+The "hello.py" file contains the Flask application
+The templates folder contains the html template (jinja2)
+The "flask_celery.py" file contains tools from the Celery documentation however we are uncertain of how the Celery app completely works. (and if it actually works)
